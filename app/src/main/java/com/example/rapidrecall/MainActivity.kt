@@ -40,7 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,6 +84,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyNavigation(modifier: Modifier){
     val navController = rememberNavController()
+
 
     NavHost (navController=navController, startDestination = "start")
     {
@@ -137,21 +140,35 @@ fun StartScreen(modifier: Modifier = Modifier, navController: NavController) {
             }
 
 
+        Row(
+            modifier = modifier.padding(vertical = 1.dp)
+        ) {
+            Text( text = "Total attempts", color = Color.Black, fontWeight = FontWeight.Bold)
+            Spacer(modifier = modifier.weight(0.5f))
+            Text("Total correct attempts" , color = Color.Black, fontWeight = FontWeight.Bold)
+            Spacer(modifier = modifier.weight(0.5f))
+            Text("Overall accuracy %" , color = Color.Black, fontWeight = FontWeight.Bold)
+
+        }
+
+
 
         Row(
-            modifier = modifier.padding(vertical = 50.dp)
+           horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text( text = "Total attempts: $attempts", color = Color.Black, fontWeight = FontWeight.Bold)
+            Text( text = "$attempts", color = Color.Blue, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Spacer(modifier = modifier.weight(0.5f))
-            Text("Total correct attempts: $correctAttempts" , color = Color.Black, fontWeight = FontWeight.Bold)
+            Text("$correctAttempts" , color = Color.Blue, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Spacer(modifier = modifier.weight(0.5f))
-            Text("Overall accuracy %: $accuracyPercentage" , color = Color.Black, fontWeight = FontWeight.Bold)
+            Text("$accuracyPercentage" , color = Color.Blue, fontWeight = FontWeight.Bold, fontSize = 15.sp)
 
         }
 
         Spacer(modifier = modifier.weight(1f))
 
         Row(
+            modifier = modifier.padding(vertical = 10.dp)
 
         ) {
             Text( text = "Sequence Length", color = Color.Black, fontWeight = FontWeight.Bold)
@@ -202,40 +219,47 @@ fun AttemptLog(
 
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .background(color = Color.Blue),
+        verticalAlignment = Alignment.CenterVertically
+
 
 
     ) {
         Text(
             text = attempt.sequenceLength.toString(),
             fontSize = 20.sp,
-            modifier = modifier.weight(1f)
+            modifier = modifier.weight(1f),
+            color = Color.White
         )
         Spacer(modifier = modifier.weight(0.5f))
         Text(
             text = attempt.userInput,
             fontSize = 20.sp,
-            modifier = modifier.weight(1f)
+            modifier = modifier.weight(1f),
+            color = Color.White
         )
         Spacer(modifier = modifier.weight(0.5f))
         Text(
             text = attempt.targetSequence,
             fontSize = 20.sp,
-            modifier = modifier.weight(1f)
+            modifier = modifier.weight(1f),
+            color = Color.White
         )
 
         Text(
             text = attempt.verdict,
             fontSize = 20.sp,
-            modifier = modifier.weight(1f)
+            modifier = modifier.weight(1f),
+            color = Color.White
         )
 
         Text(
             text = attempt.timeStamp,
             fontSize = 15.sp,
-            modifier = modifier.weight(1f)
+            modifier = modifier.weight(1f),
+            color = Color.White
         )
     }
 }
@@ -275,6 +299,8 @@ fun GameScreen(modifier: Modifier,navController: NavController){
 
     val context = LocalContext.current
 
+    var yourGuess by remember { mutableStateOf("") }
+
     var showInputField by remember { mutableStateOf(false) }
 
     var timer by remember { mutableIntStateOf(2) }
@@ -286,6 +312,7 @@ fun GameScreen(modifier: Modifier,navController: NavController){
         Row( modifier = modifier.padding(50.dp)) {
 
             Button(
+
                 onClick = {
 
                     navController.popBackStack()
@@ -294,6 +321,7 @@ fun GameScreen(modifier: Modifier,navController: NavController){
                 modifier = modifier
                     .width(100.dp)
                     .height(50.dp)
+
 
             ) {Text("<-") }
 
@@ -312,6 +340,8 @@ fun GameScreen(modifier: Modifier,navController: NavController){
             )
 
             Button(
+                modifier = modifier.height(70.dp),
+
                 onClick = {
 
                     if(sequenceLength.toInt() in 1..10) {
@@ -346,7 +376,10 @@ fun GameScreen(modifier: Modifier,navController: NavController){
 
         if (showSequence){
             Row(
-
+                modifier = modifier.fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
                 ) {
 
                 var currentIndex by remember { mutableIntStateOf(0) }
@@ -392,6 +425,7 @@ fun GameScreen(modifier: Modifier,navController: NavController){
             Spacer(modifier = modifier.width(8.dp))
 
             Button(
+                modifier = modifier.height(70.dp),
                 onClick = {
 
                     sessionModel.attempts++
@@ -422,6 +456,7 @@ fun GameScreen(modifier: Modifier,navController: NavController){
                         )
                     )
 
+                    yourGuess = userGuess
                     userGuess = ""
 
 
@@ -440,7 +475,7 @@ fun GameScreen(modifier: Modifier,navController: NavController){
             modifier = modifier.padding(20.dp)
         ) {
             Text(text="Correct sequence:$randomSequence", fontWeight = FontWeight.Bold)
-            Text(text="Your sequence: $userGuess", fontWeight = FontWeight.Bold)
+            Text(text="Your sequence: $yourGuess", fontWeight = FontWeight.Bold)
         }
     }
 
