@@ -305,11 +305,13 @@ fun GameScreen(modifier: Modifier,navController: NavController){
 
     var timer by remember { mutableIntStateOf(2) }
 
+    var showComparison by remember { mutableStateOf(false) }
+
     Column(
 
     ) {
 
-        Row( modifier = modifier.padding(50.dp)) {
+        Row(modifier = modifier.padding(50.dp)) {
 
             Button(
 
@@ -323,7 +325,7 @@ fun GameScreen(modifier: Modifier,navController: NavController){
                     .height(50.dp)
 
 
-            ) {Text("<-") }
+            ) { Text("<-") }
 
         }
 
@@ -334,17 +336,17 @@ fun GameScreen(modifier: Modifier,navController: NavController){
             OutlinedTextField(
                 modifier = modifier.weight(0.11f),
                 value = sequenceLength,
-                onValueChange = {sequenceLength = it},
-                label = {Text("Choose Sequence length")},
+                onValueChange = { sequenceLength = it },
+                label = { Text("Choose Sequence length") },
 
-            )
+                )
 
             Button(
                 modifier = modifier.height(70.dp),
 
                 onClick = {
 
-                    if(sequenceLength.toInt() in 1..10) {
+                    if (sequenceLength.toInt() in 1..10) {
 
 
                         randomSequence = ""
@@ -356,14 +358,18 @@ fun GameScreen(modifier: Modifier,navController: NavController){
 
                         showSequence = true
 
-                    }
-
-                    else if(sequenceLength.toInt()<1){
-                        Toast.makeText(context, "Please a choose sequence length", Toast.LENGTH_LONG).show()
-                    }
-
-                    else if(sequenceLength.toInt()>10){
-                        Toast.makeText(context, "Please choose a length less than 10", Toast.LENGTH_LONG).show()
+                    } else if (sequenceLength.toInt() < 1) {
+                        Toast.makeText(
+                            context,
+                            "Please a choose sequence length",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else if (sequenceLength.toInt() > 10) {
+                        Toast.makeText(
+                            context,
+                            "Please choose a length less than 10",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
 
 
@@ -374,18 +380,18 @@ fun GameScreen(modifier: Modifier,navController: NavController){
 
         Spacer(modifier = modifier.width(8.dp))
 
-        if (showSequence){
+        if (showSequence) {
             Row(
                 modifier = modifier.fillMaxWidth()
                     .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
-                ) {
+            ) {
 
                 var currentIndex by remember { mutableIntStateOf(0) }
 
                 LaunchedEffect(Unit) {
-                    for (i in randomSequence.indices){
+                    for (i in randomSequence.indices) {
                         currentIndex = i
                         delay(1000.milliseconds)
                     }
@@ -396,12 +402,13 @@ fun GameScreen(modifier: Modifier,navController: NavController){
 
                 }
 
-                Text(text = randomSequence[currentIndex].toString(),
+                Text(
+                    text = randomSequence[currentIndex].toString(),
                     modifier = modifier.padding(vertical = 50.dp),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                    )
-
+                    fontSize = 20.sp,
+                    color = Color.Blue
+                )
 
 
             }
@@ -410,72 +417,74 @@ fun GameScreen(modifier: Modifier,navController: NavController){
 
         Row() {
 
-            if (showInputField){
+            if (showInputField) {
 
 
-            OutlinedTextField(
-                value = userGuess,
-                onValueChange = {userGuess=it},
-                label = {Text("Guess sequence")},
-                modifier = modifier.weight(1f)
-            )
+                OutlinedTextField(
+                    value = userGuess,
+                    onValueChange = { userGuess = it },
+                    label = { Text("Guess sequence") },
+                    modifier = modifier.weight(1f)
+                )
 
 
 
-            Spacer(modifier = modifier.width(8.dp))
+                Spacer(modifier = modifier.width(8.dp))
 
-            Button(
-                modifier = modifier.height(70.dp),
-                onClick = {
+                Button(
+                    modifier = modifier.height(70.dp),
+                    onClick = {
 
-                    sessionModel.attempts++
+                        sessionModel.attempts++
 
-                    if (userGuess == randomSequence){
-                        sessionModel.correctAttempts++
-                        verdict = "Correct!"
+                        if (userGuess == randomSequence) {
+                            sessionModel.correctAttempts++
+                            verdict = "Correct!"
 
-                        Toast.makeText(context, "Correct guess!", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Correct guess!", Toast.LENGTH_LONG).show()
 
-                    }
-                    else {
-                        Toast.makeText(context, "Incorrect guess!", Toast.LENGTH_LONG).show()
-                        verdict = "Incorrect!"
-                    }
+                        } else {
+                            Toast.makeText(context, "Incorrect guess!", Toast.LENGTH_LONG).show()
+                            verdict = "Incorrect!"
+                        }
 
 
-                    sessionModel.overallAccuracy = (sessionModel.correctAttempts.toDouble()/sessionModel.attempts.toDouble())*100
-                    showInputField = false
+                        sessionModel.overallAccuracy =
+                            (sessionModel.correctAttempts.toDouble() / sessionModel.attempts.toDouble()) * 100
+                        showInputField = false
 
-                    sessionModel.addAttemptLog(
-                        attempt = AttemptLogs(
-                            sequenceLength.toInt(),
-                            userGuess,
-                            targetSequence = randomSequence,
-                            verdict = verdict,
-                            timeStamp = timeStamp.toString()
+                        sessionModel.addAttemptLog(
+                            attempt = AttemptLogs(
+                                sequenceLength.toInt(),
+                                userGuess,
+                                targetSequence = randomSequence,
+                                verdict = verdict,
+                                timeStamp = timeStamp.toString()
+                            )
                         )
-                    )
 
-                    yourGuess = userGuess
-                    userGuess = ""
+                        yourGuess = userGuess
+                        userGuess = ""
 
-
-
+                        showComparison = true
 
 
-                }
-            ) { Text("Play") }
+                    }
+                ) { Text("Play") }
 
 
-
-        }
+            }
         }
 
-        Row(
-            modifier = modifier.padding(20.dp)
-        ) {
-            Text(text="Correct sequence:$randomSequence", fontWeight = FontWeight.Bold)
-            Text(text="Your sequence: $yourGuess", fontWeight = FontWeight.Bold)
+        if (showComparison) {
+
+
+            Row(
+                modifier = modifier.padding(20.dp)
+            ) {
+                Text(text = "Correct sequence:$randomSequence", fontWeight = FontWeight.Bold)
+                Text(text = "Your sequence: $yourGuess", fontWeight = FontWeight.Bold)
+            }
         }
     }
 
